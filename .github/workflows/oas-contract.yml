@@ -14,6 +14,10 @@ on:
         type: boolean
         description: Validate the contract against CodeCloud's spectral rules?
         default: true
+      create-workspace-artifact:
+        type: boolean
+        description: Create an artifact of the workspace in order to debug failing pipelines
+        default: false
     secrets:
       pat-github:
         description: GitHub PAT
@@ -77,6 +81,12 @@ jobs:
           cd ./workflow/client-generator/Source/Assemblies/CodeCloud.Clis.ClientGeneration
           dotnet run --launch-profile Production
           ls -A
+      - if: ${{ inputs.create-workspace-artifact == true }}
+        name: Validate spectral
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
       - name: nuget-push
         uses: ./workflow/actions/dotnet-publish-nuget
         with:
