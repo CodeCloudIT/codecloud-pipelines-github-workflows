@@ -82,7 +82,7 @@ jobs:
           dotnet run --launch-profile Production
           ls -A
       - if: ${{ inputs.create-workspace-artifact == true }}
-        name: Validate spectral
+        name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: workspace
