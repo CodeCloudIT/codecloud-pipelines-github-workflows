@@ -3,30 +3,38 @@ name: Sync Environment Workflow
 on:
   workflow_call:
     inputs:
+      ui-enabled:
+        description: Whether or not a ui exists.
+        type: boolean
+        default: true
+      api-enabled:
+        description: Whether or not an api exists.
+        type: boolean
+        default: true
       app-id:
         description: The unique app identifier in case of a mobile app.
         type: string
-        required: true
+        required: false
       api-image-uri:
         description: The AWS ECR link to the Docker image repository.
         type: string
-        required: true
+        required: false
       cloudfront-distribution:
         description: The ID of the AWS Cloudfront distribution
         type: string
-        required: true
+        required: false
       lambda-function:
         description: The name of the lambda function
         type: string
-        required: true
+        required: false
       s3-bucket:
         description: The name of the AWS S3 bucket
         type: string
-        required: true
+        required: false
       ui-repository:
         description: The '[org]/[repository]' location of the UI repository
         type: string
-        required: true
+        required: false
     secrets:
       aws-region:
         description: The region in AWS to push to
@@ -69,7 +77,7 @@ jobs:
   
   sync-api:
     needs: preparations
-    if: ${{ needs.preparations.outputs.api_changed == 'true' }}
+    if: ${{ needs.preparations.outputs.api_changed == 'true'  && inputs.api-enabled == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -109,7 +117,7 @@ jobs:
 
   sync-ui:
     needs: preparations
-    if: ${{ needs.preparations.outputs.ui_changed == 'true' }}
+    if: ${{ needs.preparations.outputs.ui_changed == 'true' && inputs.ui-enabled == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
