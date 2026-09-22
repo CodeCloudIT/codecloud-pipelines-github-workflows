@@ -44,10 +44,6 @@ on:
         type: string
         description: The keystore password
         required: true
-      pat-github:
-        type: string
-        description: GitHub PAT
-        required: true
       replacements-out:
         type: string
         description: Replacement values separated by a semicolon (;)
