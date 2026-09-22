@@ -40,10 +40,6 @@ on:
         description: Root folder of the source code
         required: false
         default: "./workflow/repository"
-      replacements-out:
-        type: string
-        description: Replacement values separated by a semicolon (;)
-        required: false
     secrets:
       pat-github:
         description: GitHub PAT
@@ -51,6 +47,9 @@ on:
       key-store-password:
         description: The keystore password
         required: true
+      replacements-out:
+        description: Replacement values separated by a semicolon (;)
+        required: false
         
 
 jobs:
@@ -78,7 +77,7 @@ jobs:
         uses: ./workflow/actions/replace-placeholders
         with:
           replacements-in: ${{inputs.replacements-in}}
-          replacements-out: ${{inputs.replacements-out}}
+          replacements-out: ${{secrets.replacements-out}}
       - id: semver
         uses: ./workflow/actions/gitversion-semver
       - if: ${{inputs.build-android}}
