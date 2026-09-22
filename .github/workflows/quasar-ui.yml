@@ -52,6 +52,10 @@ on:
         type: string
         description: Replacement values separated by a semicolon (;)
         required: false
+    secrets:
+      pat-github:
+        description: GitHub PAT
+        required: true
 
 jobs:
   preparations:
@@ -64,7 +68,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{inputs.repository}}
-          token: ${{ inputs.pat-github }}
+          token: ${{ secrets.pat-github }}
           path: workflow/repository
           fetch-depth: 0
       - name: Checkout CodeCloud actions
@@ -72,7 +76,7 @@ jobs:
         with:
           ref: master
           repository: CodeCloudIT/codecloud-pipelines-github-actions
-          token: ${{ inputs.pat-github }}
+          token: ${{ secrets.pat-github }}
           path: workflow/actions
       - name: Replace placeholders
         uses: ./workflow/actions/replace-placeholders
@@ -177,7 +181,7 @@ jobs:
         with:
           ref: master
           repository: CodeCloudIT/codecloud-pipelines-github-actions
-          token: ${{ inputs.pat-github }}
+          token: ${{ secrets.pat-github }}
           path: workflow/actions
       - name: release
         uses: actions/create-release@v1
@@ -188,7 +192,7 @@ jobs:
           release_name: ${{ needs.preparations.outputs.semantic-version }}
           tag_name: ${{ needs.preparations.outputs.semantic-version }}
         env:
-          GITHUB_TOKEN: ${{ inputs.pat-github }}
+          GITHUB_TOKEN: ${{ secrets.pat-github }}
       - if: ${{inputs.build-web}}
         name: Download WEB package
         uses: actions/download-artifact@v4
@@ -203,7 +207,7 @@ jobs:
         name: Upload quasar-web to release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ inputs.pat-github }}
+          GITHUB_TOKEN: ${{ secrets.pat-github }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./output/web/quasar-web.tar.gz
@@ -223,7 +227,7 @@ jobs:
         name: Upload quasar-android to release
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ inputs.pat-github }}
+          GITHUB_TOKEN: ${{ secrets.pat-github }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./output/android/quasar-android.tar.gz
@@ -234,7 +238,7 @@ jobs:
         with:
           ref: "development"
           repository: ${{ github.repository_owner }}/${{ inputs.application-name }}-${{inputs.environment-name}}
-          token: ${{inputs.pat-github}}
+          token: ${{secrets.pat-github}}
           path: workflow/gitops
       - name: Set GitOps version
         uses: fjogeleit/yaml-update-action@main
@@ -248,7 +252,7 @@ jobs:
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@v1.7.2
         env:
-          API_TOKEN_GITHUB: ${{ inputs.pat-github }}
+          API_TOKEN_GITHUB: ${{ secrets.pat-github }}
         with:
           source-directory: workflow/gitops
           destination-github-username: ${{ github.repository_owner }}
@@ -260,7 +264,7 @@ jobs:
         uses: ./workflow/actions/github-clean-prerelease-versions
         with:
           repo: ${{ github.repository }}
-          token: ${{ inputs.pat-github }}
+          token: ${{ secrets.pat-github }}
           specifiedVersion: ${{ needs.preparations.outputs.semantic-version }}
 
   clean-up:
@@ -273,11 +277,11 @@ jobs:
         with:
           ref: master
           repository: CodeCloudIT/codecloud-pipelines-github-actions
-          token: ${{ inputs.pat-github }}
+          token: ${{ secrets.pat-github }}
           path: workflow/actions
       - name: Clean up old tags and releases
         uses: ./workflow/actions/github-clean-tags-releases
         with:
           keep: 10
-          token: ${{ inputs.pat-github }}
+          token: ${{ secrets.pat-github }}
           semantic-version: ${{ needs.preparations.outputs.semantic-version }}
