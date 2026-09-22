@@ -40,10 +40,6 @@ on:
         description: Root folder of the source code
         required: false
         default: "./workflow/repository"
-      key-store-password:
-        type: string
-        description: The keystore password
-        required: true
       replacements-out:
         type: string
         description: Replacement values separated by a semicolon (;)
@@ -52,6 +48,10 @@ on:
       pat-github:
         description: GitHub PAT
         required: true
+      key-store-password:
+        description: The keystore password
+        required: true
+        
 
 jobs:
   preparations:
@@ -160,7 +160,7 @@ jobs:
         with:
           app-name: ${{inputs.application-name}}
           folder: ${{inputs.source-folder}}
-          key-store-password: ${{inputs.key-store-password}}
+          key-store-password: ${{secrets.key-store-password}}
 
   sync-environment:
     needs: [preparations, build-android, build-web]
